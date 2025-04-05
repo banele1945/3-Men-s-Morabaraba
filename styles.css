@@ -1,0 +1,43 @@
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #f0f0f0; /* Light gray background */
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+h1 {
+    color: green;
+    margin: 0;
+}
+
+p {
+    font-size: 18px;
+    font-weight: bold;
+    margin: 10px 0;
+}
+
+canvas {
+    background-color: white;
+    border: 3px solid black;
+    border-radius: 10px; /* Rounded corners for canvas */
+    margin-top: 20px;
+    cursor: pointer; /* Change cursor to pointer for better UX */
+    transition: opacity 0.3s; /* Smooth transition for hover */
+}
+
+canvas:hover {
+    opacity: 0.8; /* Slightly dim the canvas on hover */
+}
+
+
+.game-container {
+    text-align: center;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    padding: 100px;
+}
