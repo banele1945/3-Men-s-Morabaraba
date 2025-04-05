@@ -513,19 +513,30 @@ document.getElementById("singlePlayerBtn").addEventListener("click", function() 
     // Initial display
     updateTurnDisplay();
 
+    // Add game controls container
+    const gameControls = document.createElement("div");
+    gameControls.className = "game-controls";
+    gameControls.innerHTML = `
+        <h1>Align It</h1>
+        <p id="turnIndicator">Player 1's Turn (🔴)</p>
+    `;
+    gameContainer.insertBefore(gameControls, canvas);
+
     // Add score display elements to the HTML
     const scoreDisplay = document.createElement("div");
     scoreDisplay.id = "scoreDisplay";
     scoreDisplay.style.cssText = `
-        position: absolute;
+        position: fixed;
         top: 20px;
         right: 20px;
         background: rgba(255, 255, 255, 0.9);
-        padding: 15px;
+        padding: clamp(10px, 2vw, 15px);
         border-radius: 10px;
         box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         font-family: Arial, sans-serif;
-        display: none; // Initially hidden
+        display: none;
+        max-width: 90%;
+        z-index: 100;
     `;
     
     const scoreElement = document.createElement("div");
