@@ -323,19 +323,28 @@ canvas.addEventListener("click", function(event) {
                             setTimeout(() => {
                                 let aiMove = aiMakeMove(nodeStates, currentPlayer, isPlacementPhase, playerMoves, maxMoves, currentDifficulty);
                                 if (aiMove !== null) {
+                                    // Apply the AI move to the game state
+                                    if (isPlacementPhase) {
+                                        nodeStates[aiMove] = currentPlayer;
+                                        playerMoves[currentPlayer]++;
+                                    } else {
+                                        nodeStates[aiMove.to] = currentPlayer;
+                                        nodeStates[aiMove.from] = 0;
+                                    }
+                                    
                                     nodeScales[isPlacementPhase ? aiMove : aiMove.to] = 1.2;
                                     setTimeout(() => nodeScales[isPlacementPhase ? aiMove : aiMove.to] = 1.0, 200);
                                     drawNodes();
                                     audioPlace.play();
-                                    totalMoves++; // Increment total moves for AI move
+                                    totalMoves++;
                                     updateScoreDisplay();
 
                                     if (checkWin(currentPlayer)) return;
 
                                     // Check if placement phase is complete after AI move
-                    if (playerMoves[1] === maxMoves && playerMoves[2] === maxMoves) {
+                                    if (playerMoves[1] === maxMoves && playerMoves[2] === maxMoves) {
                                         isPlacementPhase = false;
-                                        currentPlayer = 1; // Player 1 starts movement phase
+                                        currentPlayer = 1;
                                         updateTurnDisplay();
                                         return;
                                     }
@@ -344,7 +353,7 @@ canvas.addEventListener("click", function(event) {
                                     updateTurnDisplay();
                                 }
                             }, 500);
-                    }
+                        }
                 }
             } else {
                 // Movement Phase
@@ -381,11 +390,15 @@ canvas.addEventListener("click", function(event) {
                                 setTimeout(() => {
                                     let aiMove = aiMakeMove(nodeStates, currentPlayer, isPlacementPhase, playerMoves, maxMoves, currentDifficulty);
                                     if (aiMove !== null) {
-                                        nodeScales[isPlacementPhase ? aiMove : aiMove.to] = 1.2;
-                                        setTimeout(() => nodeScales[isPlacementPhase ? aiMove : aiMove.to] = 1.0, 200);
+                                        // Apply the AI move to the game state
+                                        nodeStates[aiMove.to] = currentPlayer;
+                                        nodeStates[aiMove.from] = 0;
+                                        
+                                        nodeScales[aiMove.to] = 1.2;
+                                        setTimeout(() => nodeScales[aiMove.to] = 1.0, 200);
                                         drawNodes();
                                         audioPlace.play();
-                                        totalMoves++; // Increment total moves for AI move
+                                        totalMoves++;
                                         updateScoreDisplay();
 
                                         if (checkWin(currentPlayer)) return;
@@ -462,8 +475,9 @@ document.getElementById("singlePlayerBtn").addEventListener("click", function() 
         restartGame();
         document.getElementById("difficultySelection").style.display = "none";
         gameContainer.style.display = "block";
-        // Show score display for single player mode
+        // Show score display and back button for single player mode
         document.getElementById("scoreDisplay").style.display = "block";
+        backButton.style.display = "block";
     }
 
     // Function to start Two Player mode
@@ -472,8 +486,9 @@ document.getElementById("singlePlayerBtn").addEventListener("click", function() 
         restartGame();
         document.querySelector(".mode-selection").style.display = "none";
         gameContainer.style.display = "block";
-        // Hide score display for two player mode
+        // Hide score display but show back button for two player mode
         document.getElementById("scoreDisplay").style.display = "none";
+        backButton.style.display = "block";
     }
 
     function restartGame() {
@@ -527,6 +542,52 @@ document.getElementById("singlePlayerBtn").addEventListener("click", function() 
     scoreDisplay.appendChild(scoreElement);
     scoreDisplay.appendChild(gameStats);
     gameContainer.appendChild(scoreDisplay);
+
+    // Add back button
+    const backButton = document.createElement("button");
+    backButton.id = "backButton";
+    backButton.textContent = "← Back to Menu";
+    backButton.style.cssText = `
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        padding: 10px 20px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        font-family: Arial, sans-serif;
+        transition: background-color 0.3s;
+        display: none; // Initially hidden
+    `;
+
+    // Add hover effect
+    backButton.addEventListener('mouseover', () => {
+        backButton.style.backgroundColor = '#45a049';
+    });
+
+    backButton.addEventListener('mouseout', () => {
+        backButton.style.backgroundColor = '#4CAF50';
+    });
+
+    // Add click handler
+    backButton.addEventListener('click', () => {
+        // Hide game container and score display
+        gameContainer.style.display = "none";
+        scoreDisplay.style.display = "none";
+        backButton.style.display = "none";
+
+        // Show mode selection
+        document.querySelector(".mode-selection").style.display = "block";
+        document.getElementById("difficultySelection").style.display = "none";
+
+        // Reset game state
+        restartGame();
+    });
+
+    gameContainer.appendChild(backButton);
     
     // Initialize score display
     updateScoreDisplay();

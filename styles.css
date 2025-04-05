@@ -1,21 +1,25 @@
+/* Base styles */
 body {
     font-family: 'Roboto', sans-serif;
-    background-color: #f0f0f0; /* Light gray background */
+    background-color: #f0f0f0;
     margin: 0;
+    padding: 0;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    min-height: 100vh;
+    overflow-x: hidden;
 }
 
 h1 {
     color: green;
     margin: 0;
+    font-size: clamp(24px, 5vw, 36px);
 }
 
 p {
-    font-size: 18px;
+    font-size: clamp(14px, 3vw, 18px);
     font-weight: bold;
     margin: 10px 0;
 }
@@ -23,21 +27,163 @@ p {
 canvas {
     background-color: white;
     border: 3px solid black;
-    border-radius: 10px; /* Rounded corners for canvas */
+    border-radius: 10px;
     margin-top: 20px;
-    cursor: pointer; /* Change cursor to pointer for better UX */
-    transition: opacity 0.3s; /* Smooth transition for hover */
+    cursor: pointer;
+    transition: opacity 0.3s;
+    max-width: 100%;
+    height: auto;
 }
 
 canvas:hover {
-    opacity: 0.8; /* Slightly dim the canvas on hover */
+    opacity: 0.8;
 }
-
 
 .game-container {
     text-align: center;
     background-color: #ffffff;
     border-radius: 10px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    padding: 100px;
+    padding: clamp(20px, 5vw, 100px);
+    position: relative;
+    width: 90%;
+    max-width: 800px;
+    margin: 20px auto;
+}
+
+/* Mode selection styles */
+.mode-selection, #difficultySelection {
+    text-align: center;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    padding: clamp(20px, 5vw, 50px);
+    width: 90%;
+    max-width: 400px;
+    margin: 20px auto;
+}
+
+button {
+    padding: clamp(10px, 2vw, 15px) clamp(20px, 4vw, 30px);
+    font-size: clamp(14px, 3vw, 18px);
+    margin: 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: #4CAF50;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+/* Score display responsive styles */
+#scoreDisplay {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: rgba(255, 255, 255, 0.9);
+    padding: clamp(10px, 2vw, 15px);
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    font-family: Arial, sans-serif;
+    display: none;
+    max-width: 90%;
+    z-index: 1000;
+}
+
+#playerScore {
+    font-size: clamp(18px, 4vw, 24px);
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+#gameStats {
+    font-size: clamp(12px, 2.5vw, 14px);
+    line-height: 1.5;
+}
+
+/* Back button responsive styles */
+#backButton {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    padding: clamp(8px, 1.5vw, 10px) clamp(15px, 3vw, 20px);
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: clamp(14px, 3vw, 16px);
+    font-family: Arial, sans-serif;
+    transition: background-color 0.3s;
+    display: none;
+    z-index: 1000;
+}
+
+/* Media Queries */
+@media screen and (max-width: 768px) {
+    .game-container {
+        padding: clamp(15px, 3vw, 30px);
+    }
+
+    canvas {
+        width: 100%;
+        max-width: 400px;
+    }
+
+    #scoreDisplay {
+        position: relative;
+        top: 0;
+        right: 0;
+        margin: 20px auto;
+        width: 90%;
+    }
+
+    #backButton {
+        position: relative;
+        top: 0;
+        left: 0;
+        margin: 20px auto;
+        display: block;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .game-container {
+        padding: 15px;
+    }
+
+    button {
+        width: 90%;
+        max-width: 200px;
+    }
+
+    #scoreDisplay, #backButton {
+        width: 90%;
+        margin: 10px auto;
+    }
+}
+
+/* Landscape mode adjustments */
+@media screen and (max-height: 600px) and (orientation: landscape) {
+    .game-container {
+        padding: 10px;
+    }
+
+    canvas {
+        max-height: 70vh;
+    }
+
+    #scoreDisplay {
+        position: relative;
+        margin: 10px auto;
+    }
+
+    #backButton {
+        position: relative;
+        margin: 10px auto;
+    }
 }

@@ -45,9 +45,71 @@ function canWinInNextMove(nodeStates, player) {
     return null;
 }
 
+// Function to evaluate a move's strategic value
+function evaluateMove(nodeStates, move, currentPlayer, isPlacementPhase) {
+    let score = 0;
+    let newStates = [...nodeStates];
+    const opponent = currentPlayer === 1 ? 2 : 1;
+
+    // Simulate the move
+    if (isPlacementPhase) {
+        newStates[move] = currentPlayer;
+    } else {
+        newStates[move.to] = currentPlayer;
+        newStates[move.from] = 0;
+    }
+
+    // 1. Center control (highest priority)
+    if (isPlacementPhase && move === 4) {
+        score += 5;
+    }
+
+    // 2. Check if this move creates a potential winning opportunity
+    for (let combo of winningCombinations) {
+        let playerPieces = combo.filter(index => newStates[index] === currentPlayer).length;
+        let emptySpaces = combo.filter(index => newStates[index] === 0).length;
+        if (playerPieces === 2 && emptySpaces === 2) score += 4;
+    }
+
+    // 3. Check if this move blocks opponent's potential winning opportunities
+    for (let combo of winningCombinations) {
+        let opponentPieces = combo.filter(index => newStates[index] === opponent).length;
+        let emptySpaces = combo.filter(index => newStates[index] === 0).length;
+        if (opponentPieces === 2 && emptySpaces === 2) score += 3;
+    }
+
+    // 4. Mobility evaluation
+    let mobility = 0;
+    if (!isPlacementPhase) {
+        for (let i = 0; i < newStates.length; i++) {
+            if (newStates[i] === currentPlayer) {
+                mobility += adjacencyList[i].filter(j => newStates[j] === 0).length;
+            }
+        }
+        score += mobility * 0.5;
+    }
+
+    // 5. Corner control
+    const corners = [0, 2, 6, 8];
+    if (isPlacementPhase && corners.includes(move)) {
+        score += 2;
+    }
+
+    // 6. Defensive positioning
+    if (!isPlacementPhase) {
+        const defensivePositions = [1, 3, 5, 7];
+        if (defensivePositions.includes(move.to)) {
+            score += 1;
+        }
+    }
+
+    return score;
+}
+
 // Function to let AI make a move
 function aiMakeMove(nodeStates, currentPlayer, isPlacementPhase, playerMoves, maxMoves, difficulty = "beginner") {
     let aiMove = null;
+    const opponent = currentPlayer === 1 ? 2 : 1;
 
     switch (difficulty) {
         case "beginner":
@@ -55,32 +117,7 @@ function aiMakeMove(nodeStates, currentPlayer, isPlacementPhase, playerMoves, ma
             break;
 
         case "legendary":
-            // First check if AI can win
-            aiMove = canWinInNextMove(nodeStates, currentPlayer);
-            if (aiMove !== null) {
-                // AI can win, make the winning move
-                if (isPlacementPhase) {
-                    nodeStates[aiMove] = currentPlayer;
-                    playerMoves[currentPlayer]++;
-                } else {
-                    // Find the piece to move
-                    for (let i = 0; i < nodeStates.length; i++) {
-                        if (nodeStates[i] === currentPlayer && adjacencyList[i].includes(aiMove)) {
-                            nodeStates[aiMove] = currentPlayer;
-                            nodeStates[i] = 0;
-                            aiMove = {from: i, to: aiMove};
-                            break;
-                        }
-                    }
-                }
-                return aiMove;
-            }
-
-            // Check if opponent can win and block
-            const opponent = currentPlayer === 1 ? 2 : 1;
-            const opponentWinningMove = canWinInNextMove(nodeStates, opponent);
-            
-            // Get all possible moves for the AI
+            // Get all possible moves
             let availableMoves = [];
             if (isPlacementPhase) {
                 for (let i = 0; i < nodeStates.length; i++) {
@@ -100,120 +137,63 @@ function aiMakeMove(nodeStates, currentPlayer, isPlacementPhase, playerMoves, ma
                 }
             }
 
-            // If there are no available moves, return null
+            // If no moves available, return null
             if (availableMoves.length === 0) {
                 return null;
             }
 
-            // If opponent has a winning move, try to block it
-            if (opponentWinningMove !== null) {
-                // Check if blocking the winning move is possible
+            // 1. Check for winning move
+            const winningMove = canWinInNextMove(nodeStates, currentPlayer);
+            if (winningMove !== null) {
                 if (isPlacementPhase) {
-                    if (availableMoves.includes(opponentWinningMove)) {
-                        aiMove = opponentWinningMove;
-                        nodeStates[aiMove] = currentPlayer;
-                        playerMoves[currentPlayer]++;
-                        return aiMove;
+                    if (availableMoves.includes(winningMove)) {
+                        return winningMove;
                     }
                 } else {
-                    // In movement phase, try to find a piece that can block
                     for (let move of availableMoves) {
-                        if (move.to === opponentWinningMove) {
-                            aiMove = move;
-                            nodeStates[move.to] = currentPlayer;
-                            nodeStates[move.from] = 0;
-                            return aiMove;
+                        if (move.to === winningMove) {
+                            return move;
                         }
                     }
                 }
             }
 
-            // If we can't block or there's no winning move to block,
-            // make a strategic move that doesn't put us in immediate danger
+            // 2. Block opponent's winning move
+            const opponentWinningMove = canWinInNextMove(nodeStates, opponent);
+            if (opponentWinningMove !== null) {
+                if (isPlacementPhase) {
+                    if (availableMoves.includes(opponentWinningMove)) {
+                        return opponentWinningMove;
+                    }
+                } else {
+                    for (let move of availableMoves) {
+                        if (move.to === opponentWinningMove) {
+                            return move;
+                        }
+                    }
+                }
+            }
+
+            // 3. Make strategic move
             let bestMove = null;
             let bestScore = -Infinity;
 
             for (let move of availableMoves) {
-                let score = 0;
-                let newStates = [...nodeStates];
-
-                // Simulate the move
-                if (isPlacementPhase) {
-                    newStates[move] = currentPlayer;
-                } else {
-                    newStates[move.to] = currentPlayer;
-                    newStates[move.from] = 0;
-                }
-
-                // Evaluate the move
-                // 1. Check if this move creates a potential winning opportunity
-                for (let combo of winningCombinations) {
-                    let playerPieces = combo.filter(index => newStates[index] === currentPlayer).length;
-                    let emptySpaces = combo.filter(index => newStates[index] === 0).length;
-                    if (playerPieces === 2 && emptySpaces === 2) score += 3;
-                }
-
-                // 2. Check if this move blocks opponent's potential winning opportunities
-                for (let combo of winningCombinations) {
-                    let opponentPieces = combo.filter(index => newStates[index] === opponent).length;
-                    let emptySpaces = combo.filter(index => newStates[index] === 0).length;
-                    if (opponentPieces === 2 && emptySpaces === 2) score += 2;
-                }
-
-                // 3. Check mobility (number of possible moves after this move)
-                let mobility = 0;
-                if (!isPlacementPhase) {
-                    for (let i = 0; i < newStates.length; i++) {
-                        if (newStates[i] === currentPlayer) {
-                            mobility += adjacencyList[i].filter(j => newStates[j] === 0).length;
-                        }
-                    }
-                    score += mobility * 0.5;
-                }
-
-                // Update best move if this move has a better score
+                const score = evaluateMove(nodeStates, move, currentPlayer, isPlacementPhase);
                 if (score > bestScore) {
                     bestScore = score;
                     bestMove = move;
                 }
             }
 
-            // If we found a good strategic move, make it
+            // If we found a good strategic move, use it
             if (bestMove !== null) {
-                aiMove = bestMove;
-                if (isPlacementPhase) {
-                    nodeStates[aiMove] = currentPlayer;
-                    playerMoves[currentPlayer]++;
-                } else {
-                    nodeStates[aiMove.to] = currentPlayer;
-                    nodeStates[aiMove.from] = 0;
-                }
-                return aiMove;
+                return bestMove;
             }
 
-            // If no strategic move found, make a random move
-            // Even if we're in a losing position, we'll make a move
+            // 4. Fallback to random move if no strategic move found
             aiMove = getRandomMove(nodeStates, currentPlayer, isPlacementPhase, playerMoves, maxMoves);
-            if (aiMove !== null) {
-                if (isPlacementPhase) {
-                    nodeStates[aiMove] = currentPlayer;
-                    playerMoves[currentPlayer]++;
-                } else {
-                    nodeStates[aiMove.to] = currentPlayer;
-                    nodeStates[aiMove.from] = 0;
-                }
-            }
             break;
-    }
-    
-    if (aiMove !== null) {
-        if (isPlacementPhase) {
-            nodeStates[aiMove] = currentPlayer;
-            playerMoves[currentPlayer]++;
-        } else {
-            nodeStates[aiMove.to] = currentPlayer;
-            nodeStates[aiMove.from] = 0;
-        }
     }
     
     return aiMove;
