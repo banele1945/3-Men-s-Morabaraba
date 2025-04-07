@@ -323,28 +323,19 @@ canvas.addEventListener("click", function(event) {
                             setTimeout(() => {
                                 let aiMove = aiMakeMove(nodeStates, currentPlayer, isPlacementPhase, playerMoves, maxMoves, currentDifficulty);
                                 if (aiMove !== null) {
-                                    // Apply the AI move to the game state
-                                    if (isPlacementPhase) {
-                                        nodeStates[aiMove] = currentPlayer;
-                                        playerMoves[currentPlayer]++;
-                                    } else {
-                                        nodeStates[aiMove.to] = currentPlayer;
-                                        nodeStates[aiMove.from] = 0;
-                                    }
-                                    
                                     nodeScales[isPlacementPhase ? aiMove : aiMove.to] = 1.2;
                                     setTimeout(() => nodeScales[isPlacementPhase ? aiMove : aiMove.to] = 1.0, 200);
                                     drawNodes();
                                     audioPlace.play();
-                                    totalMoves++;
+                                    totalMoves++; // Increment total moves for AI move
                                     updateScoreDisplay();
 
                                     if (checkWin(currentPlayer)) return;
 
                                     // Check if placement phase is complete after AI move
-                                    if (playerMoves[1] === maxMoves && playerMoves[2] === maxMoves) {
+                    if (playerMoves[1] === maxMoves && playerMoves[2] === maxMoves) {
                                         isPlacementPhase = false;
-                                        currentPlayer = 1;
+                                        currentPlayer = 1; // Player 1 starts movement phase
                                         updateTurnDisplay();
                                         return;
                                     }
@@ -353,7 +344,7 @@ canvas.addEventListener("click", function(event) {
                                     updateTurnDisplay();
                                 }
                             }, 500);
-                        }
+                    }
                 }
             } else {
                 // Movement Phase
@@ -390,15 +381,11 @@ canvas.addEventListener("click", function(event) {
                                 setTimeout(() => {
                                     let aiMove = aiMakeMove(nodeStates, currentPlayer, isPlacementPhase, playerMoves, maxMoves, currentDifficulty);
                                     if (aiMove !== null) {
-                                        // Apply the AI move to the game state
-                                        nodeStates[aiMove.to] = currentPlayer;
-                                        nodeStates[aiMove.from] = 0;
-                                        
-                                        nodeScales[aiMove.to] = 1.2;
-                                        setTimeout(() => nodeScales[aiMove.to] = 1.0, 200);
+                                        nodeScales[isPlacementPhase ? aiMove : aiMove.to] = 1.2;
+                                        setTimeout(() => nodeScales[isPlacementPhase ? aiMove : aiMove.to] = 1.0, 200);
                                         drawNodes();
                                         audioPlace.play();
-                                        totalMoves++;
+                                        totalMoves++; // Increment total moves for AI move
                                         updateScoreDisplay();
 
                                         if (checkWin(currentPlayer)) return;
@@ -461,7 +448,7 @@ const adjacencyList = {
 
     // Button event listeners
     document.getElementById("twoPlayerBtn").addEventListener("click", startTwoPlayerGame);
-document.getElementById("singlePlayerBtn").addEventListener("click", function() {
+    document.getElementById("singlePlayerBtn").addEventListener("click", function() {
     document.querySelector(".mode-selection").style.display = "none";
     document.getElementById("difficultySelection").style.display = "block";
 });
@@ -475,9 +462,8 @@ document.getElementById("singlePlayerBtn").addEventListener("click", function() 
         restartGame();
         document.getElementById("difficultySelection").style.display = "none";
         gameContainer.style.display = "block";
-        // Show score display and back button for single player mode
+        // Show score display for single player mode
         document.getElementById("scoreDisplay").style.display = "block";
-        backButton.style.display = "block";
     }
 
     // Function to start Two Player mode
@@ -486,9 +472,8 @@ document.getElementById("singlePlayerBtn").addEventListener("click", function() 
         restartGame();
         document.querySelector(".mode-selection").style.display = "none";
         gameContainer.style.display = "block";
-        // Hide score display but show back button for two player mode
+        // Hide score display for two player mode
         document.getElementById("scoreDisplay").style.display = "none";
-        backButton.style.display = "block";
     }
 
     function restartGame() {
@@ -513,30 +498,19 @@ document.getElementById("singlePlayerBtn").addEventListener("click", function() 
     // Initial display
     updateTurnDisplay();
 
-    // Add game controls container
-    const gameControls = document.createElement("div");
-    gameControls.className = "game-controls";
-    gameControls.innerHTML = `
-        <h1>Align It</h1>
-        <p id="turnIndicator">Player 1's Turn (🔴)</p>
-    `;
-    gameContainer.insertBefore(gameControls, canvas);
-
     // Add score display elements to the HTML
     const scoreDisplay = document.createElement("div");
     scoreDisplay.id = "scoreDisplay";
     scoreDisplay.style.cssText = `
-        position: fixed;
+        position: absolute;
         top: 20px;
         right: 20px;
         background: rgba(255, 255, 255, 0.9);
-        padding: clamp(10px, 2vw, 15px);
+        padding: 15px;
         border-radius: 10px;
         box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         font-family: Arial, sans-serif;
-        display: none;
-        max-width: 90%;
-        z-index: 100;
+        display: none; // Initially hidden
     `;
     
     const scoreElement = document.createElement("div");
@@ -553,52 +527,6 @@ document.getElementById("singlePlayerBtn").addEventListener("click", function() 
     scoreDisplay.appendChild(scoreElement);
     scoreDisplay.appendChild(gameStats);
     gameContainer.appendChild(scoreDisplay);
-
-    // Add back button
-    const backButton = document.createElement("button");
-    backButton.id = "backButton";
-    backButton.textContent = "← Back to Menu";
-    backButton.style.cssText = `
-        position: absolute;
-        top: 20px;
-        left: 20px;
-        padding: 10px 20px;
-        background-color: #4CAF50;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        font-size: 16px;
-        font-family: Arial, sans-serif;
-        transition: background-color 0.3s;
-        display: none; // Initially hidden
-    `;
-
-    // Add hover effect
-    backButton.addEventListener('mouseover', () => {
-        backButton.style.backgroundColor = '#45a049';
-    });
-
-    backButton.addEventListener('mouseout', () => {
-        backButton.style.backgroundColor = '#4CAF50';
-    });
-
-    // Add click handler
-    backButton.addEventListener('click', () => {
-        // Hide game container and score display
-        gameContainer.style.display = "none";
-        scoreDisplay.style.display = "none";
-        backButton.style.display = "none";
-
-        // Show mode selection
-        document.querySelector(".mode-selection").style.display = "block";
-        document.getElementById("difficultySelection").style.display = "none";
-
-        // Reset game state
-        restartGame();
-    });
-
-    gameContainer.appendChild(backButton);
     
     // Initialize score display
     updateScoreDisplay();

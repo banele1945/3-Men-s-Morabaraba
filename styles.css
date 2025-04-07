@@ -1,25 +1,21 @@
-/* Base styles */
 body {
     font-family: 'Roboto', sans-serif;
-    background-color: #f0f0f0;
+    background-color: #f0f0f0; /* Light gray background */
     margin: 0;
-    padding: 0;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    min-height: 100vh;
-    overflow-x: hidden;
+    height: 100vh;
 }
 
 h1 {
     color: green;
     margin: 0;
-    font-size: clamp(24px, 5vw, 36px);
 }
 
 p {
-    font-size: clamp(14px, 3vw, 18px);
+    font-size: 18px;
     font-weight: bold;
     margin: 10px 0;
 }
@@ -27,193 +23,21 @@ p {
 canvas {
     background-color: white;
     border: 3px solid black;
-    border-radius: 10px;
+    border-radius: 10px; /* Rounded corners for canvas */
     margin-top: 20px;
-    cursor: pointer;
-    transition: opacity 0.3s;
-    max-width: 100%;
-    height: auto;
-    position: relative;
-    z-index: 1;
+    cursor: pointer; /* Change cursor to pointer for better UX */
+    transition: opacity 0.3s; /* Smooth transition for hover */
 }
 
 canvas:hover {
-    opacity: 0.8;
+    opacity: 0.8; /* Slightly dim the canvas on hover */
 }
+
 
 .game-container {
     text-align: center;
     background-color: #ffffff;
     border-radius: 10px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    padding: clamp(20px, 5vw, 100px);
-    position: relative;
-    width: 90%;
-    max-width: 800px;
-    margin: 20px auto;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-/* Mode selection styles */
-.mode-selection, #difficultySelection {
-    text-align: center;
-    background-color: #ffffff;
-    border-radius: 10px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    padding: clamp(20px, 5vw, 50px);
-    width: 90%;
-    max-width: 400px;
-    margin: 20px auto;
-}
-
-button {
-    padding: clamp(10px, 2vw, 15px) clamp(20px, 4vw, 30px);
-    font-size: clamp(14px, 3vw, 18px);
-    margin: 10px;
-    border: none;
-    border-radius: 5px;
-    background-color: #4CAF50;
-    color: white;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-button:hover {
-    background-color: #45a049;
-}
-
-/* Score display responsive styles */
-#scoreDisplay {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    background: rgba(255, 255, 255, 0.9);
-    padding: clamp(10px, 2vw, 15px);
-    border-radius: 10px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    font-family: Arial, sans-serif;
-    display: none;
-    max-width: 90%;
-    z-index: 100;
-}
-
-#playerScore {
-    font-size: clamp(18px, 4vw, 24px);
-    font-weight: bold;
-    margin-bottom: 10px;
-}
-
-#gameStats {
-    font-size: clamp(12px, 2.5vw, 14px);
-    line-height: 1.5;
-}
-
-/* Back button responsive styles */
-#backButton {
-    position: fixed;
-    top: 20px;
-    left: 20px;
-    padding: clamp(8px, 1.5vw, 10px) clamp(15px, 3vw, 20px);
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: clamp(14px, 3vw, 16px);
-    font-family: Arial, sans-serif;
-    transition: background-color 0.3s;
-    display: none;
-    z-index: 100;
-}
-
-/* Game controls container */
-.game-controls {
-    position: relative;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-bottom: 20px;
-}
-
-#turnIndicator {
-    position: relative;
-    z-index: 1;
-    margin: 10px 0;
-}
-
-/* Media Queries */
-@media screen and (max-width: 768px) {
-    .game-container {
-        padding: clamp(15px, 3vw, 30px);
-    }
-
-    canvas {
-        width: 100%;
-        max-width: 400px;
-    }
-
-    #scoreDisplay {
-        position: fixed;
-        top: 10px;
-        right: 10px;
-        width: auto;
-        min-width: 150px;
-    }
-
-    #backButton {
-        position: fixed;
-        top: 10px;
-        left: 10px;
-    }
-}
-
-@media screen and (max-width: 480px) {
-    .game-container {
-        padding: 15px;
-    }
-
-    button {
-        width: 90%;
-        max-width: 200px;
-    }
-
-    #scoreDisplay {
-        position: fixed;
-        top: 10px;
-        right: 10px;
-        width: auto;
-        min-width: 120px;
-    }
-
-    #backButton {
-        position: fixed;
-        top: 10px;
-        left: 10px;
-    }
-}
-
-/* Landscape mode adjustments */
-@media screen and (max-height: 600px) and (orientation: landscape) {
-    .game-container {
-        padding: 10px;
-    }
-
-    canvas {
-        max-height: 70vh;
-    }
-
-    #scoreDisplay {
-        position: fixed;
-        top: 10px;
-        right: 10px;
-    }
-
-    #backButton {
-        position: fixed;
-        top: 10px;
-        left: 10px;
-    }
+    padding: 100px;
 }
